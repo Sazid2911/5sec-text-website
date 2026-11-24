@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>5 Sec Text</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="5 Sec Text: the private messenger where every message disappears 5 seconds after it is read.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one countdown runs the page. A live vanishing chat opens it, then plain bands explain each part of the app. */
+:root {
+  --paper: #F6F4FB;
+  --surface: #FFFFFF;
+  --ink: #17131F;
+  --muted: #5E5870;
+  --line: #E2DDEE;
+  --brand: #6C3CE0;
+  --brand-ink: #FFFFFF;
+  --brand-soft: #ECE6FC;
+  --tick: #F0563A;
+  --phone: #17131F;
+  --screen: #FBFAFE;
+  --bubble-in: #ECE6FC;
+  --good: #1F8A55;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --wrap: 1120px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F0D15; --surface: #18151F; --ink: #EFECF7; --muted: #A69FBA; --line: #2A2537;
+    --brand: #9C7BFF; --brand-ink: #120E1C; --brand-soft: #241D38; --tick: #FF7A5E;
+    --phone: #050408; --screen: #14111C; --bubble-in: #2A2340; --good: #4FCB8A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0F0D15; --surface: #18151F; --ink: #EFECF7; --muted: #A69FBA; --line: #2A2537;
+  --brand: #9C7BFF; --brand-ink: #120E1C; --brand-soft: #241D38; --tick: #FF7A5E;
+  --phone: #050408; --screen: #14111C; --bubble-in: #2A2340; --good: #4FCB8A;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+a { color: var(--brand); }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.08; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
+.lede { color: var(--muted); font-size: 1.08rem; max-width: 62ch; }
+section { padding-block: clamp(56px, 8vw, 96px); }
+.section-head { display: grid; gap: 12px; margin-bottom: 40px; max-width: 760px; }
+
+/* ---------- top bar ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
+.logo { width: 36px; height: 36px; flex: none; }
+.nav { display: flex; gap: 22px; align-items: center; }
+.nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.nav a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 700 0.98rem var(--font-body); padding: 12px 20px; border-radius: 999px; border: 2px solid var(--brand); background: var(--brand); color: var(--brand-ink); text-decoration: none; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--brand); }
+.btn.small { padding: 8px 14px; font-size: 0.9rem; }
+@media (max-width: 760px) { .nav .hide-sm { display: none; } }
+
+/* ---------- hero ---------- */
+.hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(32px, 6vw, 72px); align-items: center; padding-block: clamp(40px, 7vw, 88px) clamp(48px, 7vw, 80px); }
+.hero-copy { display: grid; gap: 22px; min-width: 0; }
+.hero h1 { font-size: clamp(2.6rem, 6.4vw, 4.6rem); font-weight: 800; }
+.hero h1 .count { font-family: var(--font-mono); color: var(--tick); font-weight: 700; font-size: 0.92em; letter-spacing: -0.04em; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.hero-note { font-size: 0.88rem; color: var(--muted); }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 0.82rem; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--brand-soft); color: var(--ink); }
+
+/* phone demo */
+.phone-col { display: grid; justify-items: center; gap: 14px; min-width: 0; }
+.phone { width: min(320px, 100%); aspect-ratio: 9 / 18.5; background: var(--phone); border-radius: 42px; padding: 12px; box-shadow: 0 30px 60px -30px rgba(40, 20, 90, 0.45); max-width: 100%; }
+.screen { height: 100%; background: var(--screen); border-radius: 32px; overflow: hidden; display: flex; flex-direction: column; }
+.screen-top { display: flex; align-items: center; gap: 10px; padding: 18px 16px 12px; border-bottom: 1px solid var(--line); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 0.9rem; }
+.screen-top b { font-size: 0.95rem; display: block; }
+.screen-top small { color: var(--muted); font-size: 0.72rem; }
+.chat { flex: 1; padding: 16px 14px; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; }
+.bubble { max-width: 82%; padding: 10px 12px 8px; border-radius: 18px; font-size: 0.92rem; line-height: 1.4; transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease; }
+.bubble.in { background: var(--bubble-in); align-self: flex-start; border-bottom-left-radius: 6px; }
+.bubble.out { background: var(--brand); color: var(--brand-ink); align-self: flex-end; border-bottom-right-radius: 6px; }
+.bubble .meta { display: flex; align-items: center; gap: 6px; justify-content: flex-end; margin-top: 4px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; }
+.bubble.in .meta { color: var(--tick); }
+.ring { width: 18px; height: 18px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 3; }
+.ring .bg { stroke: currentColor; opacity: 0.2; }
+.ring .fg { stroke: currentColor; stroke-linecap: round; transition: stroke-dashoffset 0.25s linear; }
+.bubble.gone { opacity: 0; filter: blur(6px); transform: scale(0.96) translateY(-6px); }
+.compose { display: flex; gap: 8px; padding: 10px 12px 16px; border-top: 1px solid var(--line); }
+.compose span { flex: 1; background: var(--paper); color: var(--muted); border-radius: 999px; padding: 9px 14px; font-size: 0.82rem; }
+.compose i { width: 36px; height: 36px; border-radius: 50%; background: var(--brand); display: grid; place-items: center; }
+.demo-caption { font-size: 0.86rem; color: var(--muted); text-align: center; max-width: 30ch; }
+@media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; } .phone { width: min(290px, 100%); } }
+
+/* ---------- strip ---------- */
+.strip { border-block: 1px solid var(--line); background: var(--surface); }
+.strip .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding-block: 26px; }
+.stat { display: grid; gap: 2px; }
+.stat b { font-family: var(--font-mono); font-size: 1.5rem; color: var(--brand); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 0.9rem; color: var(--muted); }
+@media (max-width: 760px) { .strip .wrap { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---------- privacy grid ---------- */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 32px; }
+.feature { display: grid; gap: 8px; align-content: start; padding-top: 18px; border-top: 2px solid var(--line); }
+.feature .ico { width: 30px; height: 30px; color: var(--brand); }
+.feature p { color: var(--muted); font-size: 0.97rem; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+
+/* ---------- split bands (videos, deals, bluetooth) ---------- */
+.band { background: var(--surface); border-block: 1px solid var(--line); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+.split > * { min-width: 0; }
+.split .copy { display: grid; gap: 16px; }
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; }
+.checks li::before { content: ""; width: 18px; height: 18px; margin-top: 4px; border-radius: 50%; background: var(--brand-soft); box-shadow: inset 0 0 0 5px var(--brand); }
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; } .split.flip .visual { order: 2; } }
+
+/* video thread mock */
+.mock { background: var(--paper); border: 1px solid var(--line); border-radius: 22px; padding: 18px; display: grid; gap: 12px; }
+.thread-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.thread-head b { font-family: var(--font-display); font-size: 1.05rem; }
+.counters { display: flex; gap: 14px; font-family: var(--font-mono); font-weight: 700; font-variant-numeric: tabular-nums; }
+.counters span { display: inline-flex; align-items: center; gap: 6px; }
+.counters svg { width: 18px; height: 18px; }
+.rx { display: flex; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; font-size: 0.92rem; }
+.rx em { font-style: normal; font-family: var(--font-mono); font-size: 0.75rem; color: var(--tick); font-weight: 700; white-space: nowrap; }
+
+/* coupon */
+.coupon { background: var(--paper); border: 2px dashed var(--brand); border-radius: 20px; display: grid; grid-template-columns: auto 1fr; overflow: hidden; }
+.coupon .off { background: var(--brand); color: var(--brand-ink); padding: 22px 18px; display: grid; place-content: center; text-align: center; font-family: var(--font-display); }
+.coupon .off b { font-size: 2.2rem; line-height: 1; }
+.coupon .off span { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; }
+.coupon .info { padding: 18px; display: grid; gap: 6px; min-width: 0; }
+.coupon code { font-family: var(--font-mono); font-weight: 700; background: var(--surface); border: 1px solid var(--line); padding: 4px 10px; border-radius: 8px; justify-self: start; }
+.coupon small { color: var(--muted); font-size: 0.8rem; }
+.coupon-stack { display: grid; gap: 14px; }
+.confirm { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+.confirm .box { width: 20px; height: 20px; flex: none; border-radius: 6px; background: var(--brand); display: grid; place-items: center; margin-top: 2px; }
+
+/* bluetooth */
+.bt { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 28px 10px; }
+.mini { width: 92px; aspect-ratio: 9 / 17; background: var(--phone); border-radius: 18px; padding: 6px; flex: none; }
+.mini div { height: 100%; background: var(--screen); border-radius: 13px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
+.waves { flex: 1; max-width: 180px; height: 60px; color: var(--brand); }
+.code-chip { text-align: center; font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.3em; font-size: 1.4rem; }
+.code-chip small { display: block; letter-spacing: 0.02em; font-size: 0.78rem; color: var(--muted); font-weight: 500; font-family: var(--font-body); }
+
+/* ---------- comparison ---------- */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+thead th { font-family: var(--font-display); font-size: 1rem; }
+thead th.us { color: var(--brand); }
+td.us { font-weight: 700; }
+td.us::before { content: "✓ "; color: var(--good); }
+td.them { color: var(--muted); }
+.fineprint { font-size: 0.82rem; color: var(--muted); margin-top: 12px; }
+
+/* ---------- trust ---------- */
+.trust { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.trust div { display: grid; gap: 6px; align-content: start; }
+.trust b { font-family: var(--font-display); font-size: 1.05rem; }
+.trust p { color: var(--muted); font-size: 0.94rem; }
+@media (max-width: 900px) { .trust { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .trust { grid-template-columns: 1fr; } }
+
+/* ---------- download ---------- */
+.download { background: var(--brand); color: var(--brand-ink); }
+.download .wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; align-items: center; }
+.download h2 { color: var(--brand-ink); }
+.download p { opacity: 0.9; max-width: 56ch; }
+.download .btn { background: var(--brand-ink); color: var(--brand); border-color: var(--brand-ink); }
+.download .btn.ghost { background: transparent; color: var(--brand-ink); }
+.platforms { display: grid; gap: 10px; }
+.platform { display: flex; justify-content: space-between; gap: 12px; align-items: center; border: 1px solid color-mix(in srgb, var(--brand-ink) 35%, transparent); border-radius: 14px; padding: 14px 16px; font-weight: 600; }
+.platform small { font-family: var(--font-mono); font-size: 0.75rem; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--brand-ink) 18%, transparent); white-space: nowrap; }
+@media (max-width: 760px) { .download .wrap { grid-template-columns: 1fr; } }
+
+/* ---------- faq ---------- */
+.faq { display: grid; gap: 10px; max-width: 820px; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 18px; }
+summary { cursor: pointer; font-weight: 700; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--font-mono); color: var(--brand); font-size: 1.2rem; line-height: 1; }
+details[open] summary::after { content: "–"; }
+details p { color: var(--muted); padding-bottom: 16px; }
+
+/* ---------- contact ---------- */
+.contacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.contact { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.contact.main { border: 2px solid var(--brand); }
+.contact p { color: var(--muted); font-size: 0.93rem; }
+.mail { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mail code { font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; overflow-wrap: anywhere; user-select: all; }
+.copy { font: 600 0.8rem var(--font-body); background: transparent; color: var(--brand); border: 1px solid var(--brand); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.tbd { font-size: 0.85rem; color: var(--tick); font-weight: 600; }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 0.88rem; }
+.timeline li { display: flex; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--line); padding-top: 6px; }
+.timeline b { font-family: var(--font-mono); white-space: nowrap; }
+@media (max-width: 900px) { .contacts { grid-template-columns: 1fr; } }
+
+/* ---------- footer ---------- */
+footer { border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding-block: 28px; color: var(--muted); font-size: 0.88rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble, .ring .fg { transition: none; }
+}
+</style>
+</head>
+<body>
+
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="5 Sec Text home">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <rect width="48" height="48" rx="13" fill="var(--brand)"/>
+        <path d="M12 14h24a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H22l-7 6v-6h-3a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" fill="#fff"/>
+        <circle cx="24" cy="24" r="7.5" fill="none" stroke="var(--brand)" stroke-width="2" stroke-dasharray="35 12" stroke-linecap="round"/>
+        <text x="24" y="27.6" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="700" font-size="9" fill="var(--brand)">5s</text>
+      </svg>
+      5 Sec Text
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a class="hide-sm" href="#privacy">Privacy</a>
+      <a class="hide-sm" href="#videos">Videos</a>
+      <a class="hide-sm" href="#deals">Deals</a>
+      <a class="hide-sm" href="#compare">Compare</a>
+      <a class="hide-sm" href="#contact">Contact</a>
+      <a class="btn small" href="#download">Get the app</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" style="padding-block:0">
+    <div class="wrap">
+      <div class="hero-copy">
+        <span class="eyebrow">Private messenger · Android</span>
+        <h1>Read it. Then it's gone in <span class="count" id="heroCount">5</span>.</h1>
+        <p class="lede">5 Sec Text deletes every message 5 seconds after it is read. Screenshots are blocked, your home screen shows no names, and you sign up with an email instead of your phone number.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#download">Get early access</a>
+          <a class="btn ghost" href="#privacy">How it works</a>
+        </div>
+        <div class="pills" aria-label="Highlights">
+          <span class="pill">End-to-end encrypted</span>
+          <span class="pill">No phone number</span>
+          <span class="pill">Works over Bluetooth</span>
+          <span class="pill">Free</span>
+        </div>
+      </div>
+
+      <div class="phone-col">
+        <div class="phone" role="img" aria-label="Demo: a chat where each received message counts down from 5 seconds and then disappears">
+          <div class="screen">
+            <div class="screen-top">
+              <div class="avatar">A</div>
+              <div><b>Aisha</b><small>Messages vanish 5 s after reading</small></div>
+            </div>
+            <div class="chat" id="chat">
+              <div class="bubble out">Did you get the address?</div>
+              <div class="bubble in" id="demoBubble">
+                <span id="demoText">Villa 14, Al Khobar. See you at 8 🙂</span>
+                <span class="meta"><svg class="ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="bg" cx="10" cy="10" r="8"/><circle class="fg" id="ringFg" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="0"/></svg><span id="demoSec">5s</span></span>
+              </div>
+            </div>
+            <div class="compose"><span>Message</span><i aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i></div>
+          </div>
+        </div>
+        <button class="btn ghost small" id="replay" type="button">Send another message</button>
+        <p class="demo-caption">This demo runs the real timing: 5 seconds from the moment a message is shown.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip">
+    <div class="wrap">
+      <div class="stat"><b>5 s</b><span>after reading, a message is deleted</span></div>
+      <div class="stat"><b>0</b><span>names on your home screen</span></div>
+      <div class="stat"><b>AES-256</b><span>end-to-end encryption</span></div>
+      <div class="stat"><b>₹0</b><span>to sign up and use</span></div>
+    </div>
+  </div>
+
+  <section id="privacy">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Privacy by design</span>
+        <h2>Nothing stays behind</h2>
+        <p class="lede">Every part of the app is built so a conversation leaves no trace on the phone or on our servers.</p>
+      </div>
+      <div class="grid">
+        <div class="feature">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>
+          <h3>Gone 5 seconds after reading</h3>
+          <p>Texts and photos count down from 5 once opened, then are deleted from the phone and the server. Voice and video play once. Unread messages expire after 7 days.</p>
+        </div>
+        <div class="feature">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M3 3l18 18"/></svg>
+          <h3>No screenshots or recording</h3>
+          <p>Android blocks screenshots, screen recording and the recent-apps preview inside 5 Sec Text. There is no save or download button anywhere.</p>
+        </div>
+        <div class="feature">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 9h10M7 13h6" opacity=".25"/></svg>
+          <h3>A blank home screen</h3>
+          <p>No chat list and no names. When everything is read the screen is empty. New messages appear as anonymous rows until you open them.</p>
+        </div>
+        <div class="feature">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <h3>End-to-end encrypted</h3>
+          <p>Messages are locked on your phone (X25519 key exchange with AES-256-GCM) and only the people in the chat can open them. We cannot read them.</p>
+        </div>
+        <div class="feature">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          <h3>Camera only, nothing attached</h3>
+          <p>Photos and videos are taken live in the app. Nobody can forward files from their gallery, so what you see is what was just captured.</p>
+        </div>
+        <div class="feature">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+          <h3>Email sign-in, no phone number</h3>
+          <p>Sign in with a one-time link sent to your email. The app checks that an active SIM is in the phone but never reads your number.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="videos">
+    <div class="wrap split">
+      <div class="copy">
+        <span class="eyebrow">5 Sec Videos</span>
+        <h2>Your videos live on your phone</h2>
+        <p class="lede">Post up to 2 videos for friends or everyone, for 1 to 30 days. The file never goes to a server: it streams straight from your phone to the viewer's.</p>
+        <ul class="checks">
+          <li>Choose Everyone or Friends only, and how many days it stays up</li>
+          <li>Likes, comments and views arrive as private messages in a thread named after your video</li>
+          <li>Each reaction vanishes 5 seconds after you see it; the view and like totals stay</li>
+          <li>Videos are checked for nudity on the phone before they are posted</li>
+        </ul>
+      </div>
+      <div class="visual">
+        <div class="mock" aria-label="Example video thread on the uploader's phone">
+          <div class="thread-head">
+            <b>🎬 Sunset at the Corniche</b>
+            <div class="counters">
+              <span title="Views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="views">128</span></span>
+              <span title="Likes" style="color:var(--tick)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg><span id="likes">41</span></span>
+            </div>
+          </div>
+          <div class="rx"><span><b>Omar</b> liked your video ❤</span><em>4s</em></div>
+          <div class="rx"><span><b>Sara</b>: The colours at the end!</span><em>5s</em></div>
+          <div class="rx"><span><b>Imran</b> watched your video 👁</span><em>5s</em></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="deals">
+    <div class="wrap split flip">
+      <div class="visual coupon-stack">
+        <div class="coupon">
+          <div class="off"><b>25%</b><span>OFF</span></div>
+          <div class="info">
+            <b>Al Noor Bakery · Dammam</b>
+            <span>All cakes this weekend</span>
+            <code>NOOR25</code>
+            <small>Offer provided by Al Noor Bakery, who is responsible for it. Ends in 3 days.</small>
+          </div>
+        </div>
+        <div class="confirm">
+          <span class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand-ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>
+          <span><b>I confirm this offer is genuine and lawful.</b> Every vendor ticks this each time they post or update a deal.</span>
+        </div>
+      </div>
+      <div class="copy">
+        <span class="eyebrow">Deals &amp; Coupons</span>
+        <h2>Exclusive online and offline discount deals</h2>
+        <p class="lede">A separate tab where shops and suppliers post coupon codes and sale offers. Pictures only, no video, and nothing but discounts.</p>
+        <ul class="checks">
+          <li>Copy a code with one tap, filter by category, search by shop</li>
+          <li>Vendors manage their own deals: up to 10 active, each for up to 30 days</li>
+          <li>Pictures are checked for nudity on the phone; deals reported by 3 people are hidden</li>
+          <li>Free to post: reach every 5 Sec Text user near you</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="bluetooth">
+    <div class="wrap split">
+      <div class="copy">
+        <span class="eyebrow">Offline mode</span>
+        <h2>No internet? Text over Bluetooth</h2>
+        <p class="lede">On a site with no signal, at a stadium or on a flight, chat with someone nearby phone to phone. Nothing passes through a server and nothing is stored.</p>
+        <ul class="checks">
+          <li>Both phones show the same 4-character code before you connect</li>
+          <li>Text only, and the same 5-second rule applies</li>
+        </ul>
+      </div>
+      <div class="visual">
+        <div class="mock">
+          <div class="bt" aria-label="Two phones connected over Bluetooth">
+            <div class="mini"><div>You</div></div>
+            <svg class="waves" viewBox="0 0 180 60" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M10 30h160" stroke-dasharray="2 10"/>
+              <path d="M72 14q-14 16 0 32M60 6q-24 24 0 48" opacity=".5"/>
+              <path d="M108 14q14 16 0 32M120 6q24 24 0 48" opacity=".5"/>
+              <path d="M84 20l14 10-14 10V20" fill="currentColor" stroke="none"/>
+            </svg>
+            <div class="mini"><div>Friend</div></div>
+          </div>
+          <div class="code-chip">K7Q2<small>Same code on both phones</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">How it compares</span>
+        <h2>Built for chats you don't want kept</h2>
+        <p class="lede">Most messengers are built to keep your history. 5 Sec Text is built to keep nothing.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Feature</th><th scope="col" class="us">5 Sec Text</th><th scope="col">Typical messengers</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Messages disappear</th><td class="us">Always, 5 s after reading</td><td class="them">Optional, after hours or days</td></tr>
+            <tr><th scope="row">Screenshots</th><td class="us">Blocked in every chat</td><td class="them">Usually allowed</td></tr>
+            <tr><th scope="row">Sign-up</th><td class="us">Email only</td><td class="them">Phone number</td></tr>
+            <tr><th scope="row">Home screen</th><td class="us">Blank, no names</td><td class="them">Full chat list</td></tr>
+            <tr><th scope="row">Forwarding gallery files</th><td class="us">Not possible, camera only</td><td class="them">Allowed</td></tr>
+            <tr><th scope="row">Chat without internet</th><td class="us">Bluetooth text</td><td class="them">Rarely available</td></tr>
+            <tr><th scope="row">Discount deals tab</th><td class="us">Built in</td><td class="them">Not available</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fineprint">No app can stop someone photographing a screen with a second device. Share sensitive things only with people you trust.</p>
+    </div>
+  </section>
+
+  <section class="band" id="trust">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Safety</span>
+        <h2>Private, and still responsible</h2>
+      </div>
+      <div class="trust">
+        <div><b>Adults only</b><p>Everyone confirms they are 18 or older when they sign up.</p></div>
+        <div><b>Report and block</b><p>Block anyone from a chat. Report deals and videos; 3 reports hide them.</p></div>
+        <div><b>Grievance Officer</b><p>File a complaint in the app and get a ticket number at once. Complaints are answered within 7 days.</p></div>
+        <div><b>Delete any time</b><p>Withdraw consent and delete your account from Settings in two taps.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <div class="wrap">
+      <div style="display:grid;gap:18px">
+        <span class="eyebrow" style="color:var(--brand-ink);opacity:.85">Early access</span>
+        <h2>Be one of the first on 5 Sec Text</h2>
+        <p>The Android app is in testing now and coming to Google Play soon. Ask the person who shared this page for a test invite.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#faq">Read the FAQ</a>
+          <button class="btn ghost" type="button" id="shareBtn">Copy link to this page</button>
+        </div>
+        <span id="shareMsg" class="hero-note" style="color:var(--brand-ink)" aria-live="polite"></span>
+      </div>
+      <div class="platforms">
+        <div class="platform">Android test version <small>Available</small></div>
+        <div class="platform">Google Play <small>Coming soon</small></div>
+        <div class="platform">iPhone <small>Planned</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Questions</span>
+        <h2>Frequently asked</h2>
+      </div>
+      <div class="faq">
+        <details><summary>Can I get a message back after it disappears?</summary><p>No. Once a message has been read and its 5 seconds are up, it is deleted from both phones and from our servers. That is the point of the app.</p></details>
+        <details><summary>Does 5 Sec Text cost anything?</summary><p>No. Signing up and messaging are free. Sign-in uses a one-time email link, so there are no SMS charges.</p></details>
+        <details><summary>Why does it need a SIM card if it doesn't use my number?</summary><p>An active SIM helps keep out throwaway and bot accounts. The app only checks that a SIM is present; it never reads or sends your phone number.</p></details>
+        <details><summary>Are there voice or video calls?</summary><p>No, by design. 5 Sec Text is for text, photos, voice notes and short videos that disappear.</p></details>
+        <details><summary>Will I get notified when the app is closed?</summary><p>In this first version, alerts arrive while the app is open or running in the background. Notifications show only "New message", never names or text.</p></details>
+        <details><summary>How do shops post a deal?</summary><p>Open the Deals tab, tap Post a deal, add the discount, code and an optional picture, and confirm the offer is genuine and lawful. It goes live at once and ends on the date you choose.</p></details>
+      </div>
+    </div>
+  </section>
+  <section class="band" id="contact">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Contact &amp; grievances</span>
+        <h2>Talk to us</h2>
+        <p class="lede">Published under the Information Technology (Intermediary Guidelines) Rules, 2021 and the Digital Personal Data Protection Act, 2023. You can also file a complaint inside the app: Settings → Help &amp; Grievance Officer.</p>
+      </div>
+      <div class="contacts">
+        <div class="contact main">
+          <h3>Grievance Officer</h3>
+          <p>Complaints about content, accounts, removals or bans, and appeals.</p>
+          <div class="mail"><code>fivesectext.grievance@gmail.com</code><button class="copy" type="button" data-copy="fivesectext.grievance@gmail.com">Copy</button></div>
+          <p><b style="color:var(--ink)">Name:</b> <span class="tbd">To be added</span><br><b style="color:var(--ink)">Address:</b> <span class="tbd">To be added</span></p>
+          <ul class="timeline">
+            <li><span>Acknowledged</span><b>within 24 h</b></li>
+            <li><span>Nudity, sexual or morphed images</span><b>within 2 h</b></li>
+            <li><span>Other unlawful content</span><b>within 36 h</b></li>
+            <li><span>All complaints resolved</span><b>within 7 days</b></li>
+          </ul>
+          <p>Not satisfied with our decision? You can appeal to the Government of India's <a href="https://gac.gov.in" target="_blank" rel="noopener">Grievance Appellate Committee</a>.</p>
+        </div>
+        <div class="contact">
+          <h3>Privacy &amp; your data</h3>
+          <p>Ask for a summary of your data, correct or erase it, withdraw consent or nominate someone to act for you.</p>
+          <div class="mail"><code>fivesectext.privacy@gmail.com</code><button class="copy" type="button" data-copy="fivesectext.privacy@gmail.com">Copy</button></div>
+          <p>If you are not satisfied, you can complain to the Data Protection Board of India.</p>
+        </div>
+        <div class="contact">
+          <h3>Support &amp; vendors</h3>
+          <p>Help with the app, account deletion without the app, and questions about posting deals.</p>
+          <div class="mail"><code>fivesectext.support@gmail.com</code><button class="copy" type="button" data-copy="fivesectext.support@gmail.com">Copy</button></div>
+          <p>To delete your account by email, write from the address you signed up with, subject "Delete my account". We delete it within 7 days.</p>
+        </div>
+      </div>
+      <p class="fineprint" id="copyMsg" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 5 Sec Text</span>
+    <span>Grievances: fivesectext.grievance@gmail.com · Support: fivesectext.support@gmail.com · Privacy Policy and Terms of Use are in the app under Settings.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const messages = [
+    'Villa 14, Al Khobar. See you at 8 🙂',
+    'Gate code is 4471. Delete after reading!',
+    'Surprise party is Friday. Don\'t tell her 🤫',
+    'Meeting moved to 10. Bring the report.',
+    'Bank says the transfer went through.'
+  ];
+  const bubble = document.getElementById('demoBubble');
+  const text = document.getElementById('demoText');
+  const sec = document.getElementById('demoSec');
+  const ring = document.getElementById('ringFg');
+  const hero = document.getElementById('heroCount');
+  const replay = document.getElementById('replay');
+  const C = 50.27;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let i = 0, timer = null, restart = null;
+
+  function show(msg) {
+    clearInterval(timer); clearTimeout(restart);
+    text.textContent = msg;
+    bubble.classList.remove('gone');
+    let left = 5.0;
+    const paint = () => {
+      const s = Math.max(0, Math.ceil(left));
+      sec.textContent = s + 's';
+      hero.textContent = s;
+      ring.style.strokeDashoffset = String(C * (1 - left / 5));
+    };
+    paint();
+    if (reduce) return; // keep the message visible, no countdown animation
+    timer = setInterval(() => {
+      left -= 0.25;
+      paint();
+      if (left <= 0) {
+        clearInterval(timer);
+        bubble.classList.add('gone');
+        hero.textContent = '5';
+        restart = setTimeout(() => { i = (i + 1) % messages.length; show(messages[i]); }, 2200);
+      }
+    }, 250);
+  }
+  replay.addEventListener('click', () => { i = (i + 1) % messages.length; show(messages[i]); });
+  // start after a short pause so the first frame shows a full message
+  setTimeout(() => show(messages[0]), 1200);
+
+  const copyMsg = document.getElementById('copyMsg');
+  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', () => {
+    const v = b.dataset.copy;
+    const done = () => { b.textContent = 'Copied'; copyMsg.textContent = v + ' copied.'; setTimeout(() => { b.textContent = 'Copy'; }, 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(v).then(done, () => { copyMsg.textContent = 'Select and copy: ' + v; });
+    } else { copyMsg.textContent = 'Select and copy: ' + v; }
+  }));
+
+  const shareBtn = document.getElementById('shareBtn');
+  const shareMsg = document.getElementById('shareMsg');
+  shareBtn.addEventListener('click', () => {
+    const url = location.href.split('#')[0];
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(
+        () => { shareMsg.textContent = 'Link copied.'; },
+        () => { shareMsg.textContent = 'Copy this link: ' + url; }
+      );
+    } else {
+      shareMsg.textContent = 'Copy this link: ' + url;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
