@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>5 Sec Deals · Partner Portal</title>
+<style>
+  :root { --brand:#6C3CE0; --pink:#DB2777; --bg:#f6f4fb; --card:#fff; --text:#1d1830; --muted:#6b6680; --red:#c62828; --amber:#b26a00; --green:#2e7d32; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  header { background:linear-gradient(120deg,#5B21B6,var(--brand),var(--pink)); color:#fff; padding:14px 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0; flex:1; }
+  main { max-width:1100px; margin:0 auto; padding:16px; }
+  h2 { margin:.2em 0 .4em; font-size:19px; } h3 { margin:.2em 0 .4em; font-size:16px; }
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .tabs button { background:#fff; color:var(--text); border:1px solid #ddd; }
+  .tabs button.on { background:var(--brand); color:#fff; border-color:var(--brand); }
+  button { background:var(--brand); color:#fff; border:0; border-radius:8px; padding:8px 12px; font:inherit; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  button.red { background:var(--red); } button.ghost { background:#fff; color:var(--brand); border:1px solid var(--brand); }
+  input, select, textarea { font:inherit; padding:8px; border:1px solid #ccc; border-radius:8px; width:100%; background:#fff; color:var(--text); }
+  input[type=checkbox] { width:auto; }
+  textarea { min-height:60px; }
+  label { font-size:13px; color:var(--muted); display:block; }
+  .card { background:var(--card); border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:end; margin-top:8px; }
+  .row > * { flex:1 1 170px; }
+  .row > button, .row > .auto { flex:0 0 auto; }
+  .muted { color:var(--muted); font-size:13px; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:99px; font-size:12px; font-weight:700; background:#eee; }
+  .ok { background:#e3f4e5; color:var(--green); } .fix { background:#fff3d6; color:var(--amber); } .skip { background:#fde3e3; color:var(--red); }
+  .hide { display:none !important; }
+  .scroll { overflow-x:auto; max-height:420px; overflow-y:auto; border:1px solid #eee; border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; } td, th { text-align:left; padding:5px 7px; border-bottom:1px solid #eee; vertical-align:top; white-space:nowrap; }
+  th { position:sticky; top:0; background:#faf8ff; }
+  td.wrap { white-space:normal; min-width:180px; }
+  .note { background:#fff8e1; border-left:4px solid var(--amber); padding:10px 12px; border-radius:8px; margin-bottom:12px; font-size:14px; }
+  .stat { font-size:26px; font-weight:800; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+  progress { width:100%; height:14px; }
+</style>
+</head>
+<body>
+<header><h1>5 Sec Deals · Partner Portal</h1><span id="role" class="tag hide"></span><span id="who" style="color:#f0e8ff;font-size:13px"></span><button id="out" class="ghost hide">Sign out</button></header>
+<main>
+  <!-- ================= sign in ================= -->
+  <div id="login" class="card">
+    <h2>Post discounts and coupon codes on 5 Sec Text</h2>
+    <p class="muted">Vendors: post your offers here or in the app (Deals → Post deal). Use the same email and password as your 5 Sec Text account, or create one.</p>
+    <div class="row">
+      <div><label>Email</label><input id="email" type="email" autocomplete="username"></div>
+      <div><label>Password (8+ characters)</label><input id="pass" type="password" autocomplete="current-password"></div>
+      <button id="signin">Sign in</button><button id="signup" class="ghost">Create account</button>
+    </div>
+    <p class="row"><label class="auto"><input id="agree" type="checkbox"> New account: I am 18 or older and accept the <a href="https://5sectext.com/terms.html" target="_blank">Terms of Use</a> and <a href="https://5sectext.com/privacy.html" target="_blank">Privacy Policy</a></label></p>
+    <p class="row"><a href="#" id="forgot" class="auto" style="font-size:13px">Forgot password?</a></p>
+    <p id="loginMsg" class="muted"></p>
+  </div>
+
+  <div id="verify" class="card hide">
+    <h2>Verify your email</h2>
+    <p>We sent a link to <b id="vEmail"></b>. Open it, then click the button below.</p>
+    <div class="row"><button id="vDone" class="auto">I've verified</button><button id="vResend" class="ghost auto">Resend email</button></div>
+    <p id="vMsg" class="muted"></p>
+  </div>
+
+  <!-- ================= portal ================= -->
+  <div id="app" class="hide">
+    <div class="note" id="rules">By posting you confirm every offer is <b>genuine, lawful and yours to share</b> (or provided by an affiliate network you belong to).
+      Discounts only — no nudity, no fake codes, no misleading prices. Deals end automatically (max 30 days). Reported deals are hidden after 3 reports.</div>
+
+    <div class="tabs">
+      <button data-tab="bulk" class="on">Bulk upload (CSV / Excel)</button>
+      <button data-tab="single">Post one deal</button>
+      <button data-tab="mine">My deals</button>
+      <button data-tab="admin" class="adminOnly hide">Admin tools</button>
+    </div>
+
+    <!-- ---------- bulk ---------- -->
+    <section id="t-bulk">
+      <div class="card">
+        <h3>1 · Choose a file</h3>
+        <p class="muted">Use our template, or upload a coupon export straight from an affiliate network (Admitad, ArabClicks, Cuelinks…). Save Excel files as <b>CSV</b> first (File → Save As → CSV UTF-8).
+          <span class="vendorOnly">Vendors can have up to <b id="vMax">10</b> active deals.</span></p>
+        <div class="row">
+          <input id="file" type="file" accept=".csv,text/csv,.txt">
+          <button id="tpl" class="ghost auto">Download template</button>
+        </div>
+        <div class="row adminOnly hide">
+          <div><label>Post as (shown to users)</label><input id="asName" value="5 Sec Deals" maxlength="40"></div>
+          <div><label>Category when it can't be detected</label><select id="defCat"></select></div>
+          <div><label>Where (when the file doesn't say)</label><select id="defWhere"><option value="online">Online</option><option value="store">In store</option><option value="both">Online &amp; in store</option></select></div>
+          <div><label>City (for in-store deals)</label><input id="defCity" maxlength="40" placeholder="e.g. Dammam"></div>
+        </div>
+        <div class="row">
+          <label class="auto"><input id="aff" type="checkbox"> These are <b>affiliate</b> links (shows "Affiliate link · we may earn a commission")</label>
+        </div>
+      </div>
+
+      <div class="card hide" id="mapCard">
+        <h3>2 · Check columns</h3>
+        <p class="muted">We matched your file's columns automatically. Change any that look wrong.</p>
+        <div class="row" id="map"></div>
+      </div>
+
+      <div class="card hide" id="prevCard">
+        <h3>3 · Preview</h3>
+        <div class="row"><span id="summary" class="auto"></span></div>
+        <div class="scroll" style="margin-top:8px"><table id="prev"></table></div>
+        <div class="row">
+          <button id="post" class="auto">Post deals</button>
+          <span id="postMsg" class="muted"></span>
+        </div>
+        <progress id="prog" class="hide" value="0" max="1"></progress>
+      </div>
+    </section>
+
+    <!-- ---------- single ---------- -->
+    <section id="t-single" class="hide card">
+      <h3>Post one deal</h3>
+      <div class="row">
+        <div><label>Brand / shop name *</label><input id="sVendor" maxlength="40"></div>
+        <div><label>Discount * (e.g. 30% OFF, SAR 50 OFF, Buy 1 Get 1)</label><input id="sDiscount" maxlength="24"></div>
+      </div>
+      <div class="row"><div><label>Title * (what is on offer)</label><input id="sTitle" maxlength="80"></div></div>
+      <div class="row">
+        <div><label>Coupon code (optional)</label><input id="sCode" maxlength="30"></div>
+        <div><label>Link (https://…, optional)</label><input id="sLink" maxlength="190"></div>
+      </div>
+      <div class="row">
+        <div><label>Category</label><select id="sCat"></select></div>
+        <div><label>Sub-category</label><select id="sSub"></select></div>
+        <div><label>Where</label><select id="sWhere"><option value="online">Online</option><option value="store">In store</option><option value="both">Online &amp; in store</option></select></div>
+        <div><label>City (needed for in-store)</label><input id="sCity" maxlength="40"></div>
+      </div>
+      <div class="row">
+        <div style="flex:3 1 300px"><label>Shop address (optional)</label><input id="sAddr" maxlength="150" placeholder="Shop 12, Al Rashid Mall, Khobar"></div>
+      </div>
+      <div class="row">
+        <div><label>Map pin (optional) — paste coordinates or a Google Maps link</label><input id="sPin" placeholder="26.4207, 50.0888"></div>
+        <button id="sHere" class="ghost auto" type="button">📍 Use my location</button>
+        <a id="sMap" class="auto hide" target="_blank" style="font-size:13px">Check on map</a>
+      </div>
+      <div class="row">
+        <div><label>Ends on *</label><input id="sEnd" type="date"></div>
+        <div style="flex:3 1 300px"><label>Details / terms (optional)</label><input id="sDetails" maxlength="300"></div>
+      </div>
+      <div class="row"><label class="auto"><input id="sConfirm" type="checkbox"> I confirm this offer is genuine and lawful</label></div>
+      <div class="row"><button id="sPost" class="auto">Post deal</button><span id="sMsg" class="muted"></span></div>
+    </section>
+
+    <!-- ---------- mine ---------- -->
+    <section id="t-mine" class="hide">
+      <div class="card"><div class="row"><span id="mineCount" class="auto"></span><button id="mineReload" class="ghost auto">Refresh</button>
+        <button id="mineEndAll" class="red auto">End all my deals</button></div></div>
+      <div class="card"><div class="scroll"><table id="mineTable"></table></div></div>
+    </section>
+
+    <!-- ---------- admin ---------- -->
+    <section id="t-admin" class="hide">
+      <div class="grid">
+        <div class="card"><div class="muted">Live deals (all)</div><div class="stat" id="stLive">–</div></div>
+        <div class="card"><div class="muted">Posted by 5 Sec Deals</div><div class="stat" id="stAdmin">–</div></div>
+        <div class="card"><div class="muted">Affiliate deals</div><div class="stat" id="stAff">–</div></div>
+        <div class="card"><div class="muted">Expired, not yet removed</div><div class="stat" id="stExp">–</div></div>
+      </div>
+      <div class="card">
+        <h3>Clean-up</h3>
+        <p class="muted">Expired deals are already hidden in the app. This removes them from the database for good.</p>
+        <div class="row"><button id="stLoad" class="ghost auto">Refresh numbers</button><button id="cleanExp" class="auto">Delete all expired deals</button>
+          <button id="cleanBad" class="red auto">Delete deals reported 3+ times</button></div>
+        <p id="adMsg" class="muted"></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script type="module">
+// Firebase web app config (Firebase console → Project settings → Your apps → Web app).
+const firebaseConfig = {
+  apiKey: 'AIzaSyAOrX5Km9AdRiPMpdODScnZs7tZYPLbAQw',
+  authDomain: 'fivesec-text.firebaseapp.com',
+  projectId: 'fivesec-text',
+  appId: '1:155273836189:web:be9ac67038dbe45f510674',
+};
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification,
+  sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, deleteDoc, query, where, writeBatch,
+  serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const DAY = 864e5;
+const MAX_VENDOR = 10;          // same limit as the app
+const MAX_DAYS = 30;            // deals last at most 30 days (rules allow 31)
+
+const CATS = ['Food', 'Grocery', 'Fashion', 'Electronics', 'Mobile & Internet', 'Travel', 'Health & Beauty', 'Home', 'Services', 'Other'];
+const SUBS = {
+  'Food': ['Restaurants', 'Cafes', 'Delivery', 'Sweets & Bakery'],
+  'Grocery': ['Supermarket', 'Fresh food', 'Household'],
+  'Fashion': ['Shoes', 'Clothing', 'Bags', 'Watches & Jewellery', 'Kids'],
+  'Electronics': ['Phones', 'Laptops', 'TV & Audio', 'Appliances', 'Gaming'],
+  'Mobile & Internet': ['Recharge', 'Data plans', 'Accessories'],
+  'Travel': ['Flights', 'Hotels', 'Car rental', 'Tours'],
+  'Health & Beauty': ['Pharmacy', 'Cosmetics', 'Salon & Spa', 'Fitness'],
+  'Home': ['Furniture', 'Decor', 'Kitchen', 'Garden'],
+  'Services': ['Car service', 'Cleaning', 'Education', 'Repairs'],
+};
+// keywords -> category (checked against category text first, then title/brand)
+const CAT_WORDS = [
+  ['Food', /food|restaurant|pizza|burger|cafe|coffee|meal|dining|talabat|zomato|swiggy|hungerstation|jahez|kfc|mcdonald|domino/i],
+  ['Grocery', /grocery|supermarket|mart|carrefour|lulu|panda|bigbasket|blinkit|zepto|instamart|danube/i],
+  ['Fashion', /fashion|cloth|apparel|shoe|sneaker|footwear|bag|watch|jewel|namshi|myntra|ajio|shein|h&m|zara|max|centrepoint|nike|adidas|puma/i],
+  ['Electronics', /electronic|laptop|computer|phone|mobile phone|tv|audio|appliance|gaming|extra|jarir|croma|reliance digital|samsung|apple|xiaomi/i],
+  ['Mobile & Internet', /recharge|data plan|sim|internet|broadband|stc|mobily|zain|jio|airtel|vodafone|\bvi\b/i],
+  ['Travel', /travel|flight|hotel|booking|airline|trip|tour|car rental|almosafer|makemytrip|goibibo|cleartrip|wego|agoda|expedia|flynas|saudia|indigo/i],
+  ['Health & Beauty', /health|beauty|pharma|cosmetic|makeup|skincare|salon|spa|fitness|gym|nahdi|whites|nykaa|sephora|boots|faces|1mg|pharmeasy/i],
+  ['Home', /home|furniture|decor|kitchen|garden|ikea|pepperfry|home centre|homebox|abyat/i],
+  ['Services', /service|cleaning|education|course|repair|insurance|careem|uber|ola/i],
+];
+const SUB_WORDS = { Shoes: /shoe|sneaker|footwear/i, Bags: /\bbag/i, 'Watches & Jewellery': /watch|jewel/i, Phones: /phone|mobile/i, Laptops: /laptop|notebook/i,
+  Flights: /flight|airline/i, Hotels: /hotel/i, Delivery: /deliver/i, Cosmetics: /cosmetic|makeup|skincare/i, Pharmacy: /pharma/i, Recharge: /recharge/i };
+
+// column synonyms -> our fields
+const FIELDS = {
+  vendor:   { label: 'Brand / shop *', syn: ['vendor', 'brand', 'store', 'shop', 'merchant', 'advertiser', 'campaign', 'campaign name', 'campaign_name', 'program', 'programme', 'offer name', 'retailer'] },
+  title:    { label: 'Title *', syn: ['title', 'name', 'coupon name', 'coupon_name', 'offer', 'offer title', 'headline', 'deal'] },
+  discount: { label: 'Discount', syn: ['discount', 'discount value', 'value', 'amount', 'offer value', 'saving', 'savings'] },
+  code:     { label: 'Coupon code', syn: ['code', 'coupon', 'coupon code', 'coupon_code', 'promocode', 'promo code', 'promo_code', 'voucher', 'voucher code'] },
+  link:     { label: 'Link', syn: ['link', 'url', 'gotolink', 'goto_link', 'goto link', 'tracking link', 'tracking_link', 'affiliate link', 'affiliate_link', 'deeplink', 'deep link', 'landing', 'landing page', 'frameset_link'] },
+  category: { label: 'Category', syn: ['category', 'categories', 'vertical', 'sector'] },
+  sub:      { label: 'Sub-category', syn: ['sub', 'subcategory', 'sub category', 'sub_category'] },
+  where:    { label: 'Where (online/store/both)', syn: ['where', 'channel', 'online/store'] },
+  city:     { label: 'City', syn: ['city', 'location', 'region'] },
+  expires:  { label: 'Ends on', syn: ['expires', 'expiry', 'expiry date', 'expiry_date', 'end', 'end date', 'end_date', 'date_end', 'date end', 'valid till', 'valid_till', 'valid to', 'valid_to', 'valid until', 'expiration'] },
+  address:  { label: 'Shop address', syn: ['address', 'shop address', 'store address', 'street', 'location address'] },
+  lat:      { label: 'Latitude', syn: ['lat', 'latitude'] },
+  lng:      { label: 'Longitude', syn: ['lng', 'lon', 'long', 'longitude'] },
+  details:  { label: 'Details / terms', syn: ['details', 'description', 'terms', 'conditions', 'short description', 'short_description', 'rules', 'notes'] },
+};
+
+let me = null, isAdmin = false, profileName = '';
+let rows = [], header = [], mapping = {}, prepared = [];
+
+// ---------------- auth ----------------
+const msg = (t) => ($('loginMsg').textContent = t);
+const friendly = (e) => ({
+  'auth/invalid-credential': 'Wrong email or password.', 'auth/wrong-password': 'Wrong email or password.', 'auth/user-not-found': 'No account with this email.',
+  'auth/email-already-in-use': 'This email already has an account — sign in instead.', 'auth/weak-password': 'Use at least 8 characters.',
+  'auth/invalid-email': 'That email address looks wrong.', 'auth/too-many-requests': 'Too many tries. Wait a few minutes.',
+}[e.code] || ('Error: ' + (e.code || e.message)));
+$('signin').onclick = async () => { try { await signInWithEmailAndPassword(auth, $('email').value.trim(), $('pass').value); } catch (e) { msg(friendly(e)); } };
+$('signup').onclick = async () => {
+  if (!$('agree').checked) return msg('Tick the box to confirm you are 18+ and accept the Terms.');
+  if ($('pass').value.length < 8) return msg('Use at least 8 characters.');
+  try { const c = await createUserWithEmailAndPassword(auth, $('email').value.trim(), $('pass').value); await sendEmailVerification(c.user); } catch (e) { msg(friendly(e)); }
+};
+$('forgot').onclick = async (ev) => { ev.preventDefault(); try { await sendPasswordResetEmail(auth, $('email').value.trim()); msg('Password reset email sent.'); } catch (e) { msg(friendly(e)); } };
+$('out').onclick = () => signOut(auth);
+$('vResend').onclick = async () => { try { await sendEmailVerification(auth.currentUser); $('vMsg').textContent = 'Sent again.'; } catch (e) { $('vMsg').textContent = friendly(e); } };
+$('vDone').onclick = async () => {
+  await auth.currentUser.reload();
+  if (!auth.currentUser.emailVerified) { $('vMsg').textContent = 'Not verified yet — open the link in the email first.'; return; }
+  await auth.currentUser.getIdToken(true);   // refresh so the database sees "verified"
+  enter(auth.currentUser);
+};
+
+onAuthStateChanged(auth, async (u) => {
+  me = u;
+  $('who').textContent = u ? u.email : '';
+  $('out').classList.toggle('hide', !u);
+  ['login', 'verify', 'app'].forEach((id) => $(id).classList.add('hide'));
+  if (!u) { $('login').classList.remove('hide'); $('role').classList.add('hide'); return; }
+  if (!u.emailVerified) { $('vEmail').textContent = u.email; $('verify').classList.remove('hide'); return; }
+  try { const r = await u.getIdTokenResult(); if (r.claims.email_verified !== true) await u.getIdToken(true); } catch (_) {}
+  enter(u);
+});
+
+async function enter(u) {
+  ['login', 'verify'].forEach((id) => $(id).classList.add('hide'));
+  isAdmin = !!(await getDoc(doc(db, 'staff', u.uid)).catch(() => null))?.exists();
+  const prof = await getDoc(doc(db, 'users', u.uid)).catch(() => null);
+  profileName = prof?.exists() ? (prof.data().name || '') : '';
+  $('role').textContent = isAdmin ? 'ADMIN' : 'VENDOR';
+  $('role').className = 'tag ' + (isAdmin ? 'ok' : 'fix');
+  document.querySelectorAll('.adminOnly').forEach((e) => e.classList.toggle('hide', !isAdmin));
+  document.querySelectorAll('.vendorOnly').forEach((e) => e.classList.toggle('hide', isAdmin));
+  $('app').classList.remove('hide');
+  loadMine();
+  if (isAdmin) loadStats();
+}
+
+// ---------------- tabs ----------------
+document.querySelectorAll('.tabs button').forEach((b) => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b));
+  ['bulk', 'single', 'mine', 'admin'].forEach((t) => $('t-' + t).classList.toggle('hide', t !== b.dataset.tab));
+  if (b.dataset.tab === 'mine') loadMine();
+  if (b.dataset.tab === 'admin') loadStats();
+});
+
+// selects
+const fill = (sel, items, first) => { sel.innerHTML = (first ? `<option value="">${first}</option>` : '') + items.map((c) => `<option>${esc(c)}</option>`).join(''); };
+fill($('defCat'), CATS); $('defCat').value = 'Other';
+fill($('sCat'), CATS);
+const subFill = () => fill($('sSub'), SUBS[$('sCat').value] || [], '—');
+$('sCat').onchange = subFill; subFill();
+$('sEnd').value = new Date(Date.now() + 7 * DAY).toISOString().slice(0, 10);
+$('sEnd').max = new Date(Date.now() + MAX_DAYS * DAY).toISOString().slice(0, 10);
+$('vMax').textContent = MAX_VENDOR;
+
+// ---------------- template ----------------
+$('tpl').onclick = () => {
+  const csv = 'brand,title,discount,code,link,category,subcategory,where,city,address,latitude,longitude,ends_on,details\n'
+    + 'Nike,Running shoes sale,30% OFF,RUN30,https://www.example.com/sale,Fashion,Shoes,online,,,,,2026-12-20,On selected styles\n'
+    + 'Al Baik,Family meal deal,SAR 10 OFF,,,Food,Restaurants,store,Dammam,"King Saud St, Al Shati",26.4441,50.1116,2026-12-15,Show the code at the counter\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+  a.download = '5sec-deals-template.csv'; a.click();
+};
+
+// ---------------- CSV parsing ----------------
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const delim = [',', ';', '\t', '|'].map((d) => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const out = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === delim) { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); out.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); out.push(row); }
+  return out.filter((r) => r.some((x) => x.trim() !== ''));
+}
+const norm = (h) => h.toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+$('file').onchange = async () => {
+  const f = $('file').files[0]; if (!f) return;
+  const data = parseCSV(await f.text());
+  if (data.length < 2) { alert('The file has no deal rows.'); return; }
+  header = data[0].map((h) => h.trim()); rows = data.slice(1);
+  // auto-match columns
+  mapping = {};
+  const used = new Set();
+  for (const [k, f] of Object.entries(FIELDS)) {
+    const syn = f.syn.map(norm);
+    let idx = header.findIndex((h, i) => !used.has(i) && syn.includes(norm(h)));
+    if (idx < 0) idx = header.findIndex((h, i) => !used.has(i) && syn.some((s) => norm(h).includes(s)));
+    if (idx >= 0) { mapping[k] = idx; used.add(idx); }
+  }
+  renderMap(); prepare();
+};
+
+function renderMap() {
+  $('map').innerHTML = '';
+  for (const [k, f] of Object.entries(FIELDS)) {
+    const w = document.createElement('div');
+    w.innerHTML = `<label>${f.label}</label><select data-k="${k}"><option value="">— not in file —</option>${header.map((h, i) => `<option value="${i}">${esc(h)}</option>`).join('')}</select>`;
+    const s = w.querySelector('select'); s.value = mapping[k] ?? '';
+    s.onchange = () => { if (s.value === '') delete mapping[k]; else mapping[k] = +s.value; prepare(); };
+    $('map').appendChild(w);
+  }
+  $('mapCard').classList.remove('hide');
+}
+
+// ---------------- map pin ----------------
+function parseLatLng(text) {
+  let t = String(text || ''); try { t = decodeURIComponent(t); } catch (_) {}
+  for (const re of [/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/, /@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/,
+    /[?&](?:q|ll|query|destination|daddr)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/, /(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/]) {
+    const m = t.match(re);
+    if (m) { const a = +m[1], b = +m[2]; if (Math.abs(a) <= 90 && Math.abs(b) <= 180) return [a, b]; }
+  }
+  return null;
+}
+const pinShow = () => { const ll = parseLatLng($('sPin').value); $('sMap').classList.toggle('hide', !ll); if (ll) $('sMap').href = `https://www.google.com/maps/search/?api=1&query=${ll[0]},${ll[1]}`; };
+$('sPin').oninput = pinShow;
+$('sHere').onclick = () => {
+  if (!navigator.geolocation) return alert('This browser cannot read your location.');
+  $('sHere').disabled = true;
+  navigator.geolocation.getCurrentPosition((p) => { $('sPin').value = p.coords.latitude.toFixed(6) + ', ' + p.coords.longitude.toFixed(6); $('sHere').disabled = false; pinShow(); },
+    () => { $('sHere').disabled = false; alert('Could not get your location. Allow location for this site, or paste the coordinates from Google Maps.'); }, { enableHighAccuracy: true, timeout: 20000 });
+};
+
+// ---------------- cleaning one row ----------------
+const cut = (s, n) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
+function parseDate(s) {
+  s = String(s || '').trim(); if (!s) return null;
+  let m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/); if (m) return new Date(+m[1], +m[2] - 1, +m[3], 23, 59);
+  m = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})/); if (m) { const y = +m[3] < 100 ? 2000 + +m[3] : +m[3]; return new Date(y, +m[2] - 1, +m[1], 23, 59); }  // dd/mm/yyyy
+  const d = new Date(s); return isNaN(d) ? null : d;
+}
+function guessDiscount(...texts) {
+  const t = texts.join(' ');
+  const m = t.match(/(\d{1,3}\s?%\s?(off)?)|((sar|sr|aed|qar|kwd|omr|bhd|rs\.?|inr|₹|pkr|usd|\$)\s?\d[\d,.]*\s?(off)?)|(buy\s?\d\s?get\s?\d)|(free (delivery|shipping))/i);
+  return m ? cut(m[0].toUpperCase().includes('OFF') || /buy|free/i.test(m[0]) ? m[0] : m[0] + ' OFF', 24) : '';
+}
+function guessCat(catText, other) {
+  for (const c of CATS) if (catText && norm(catText) === norm(c)) return c;
+  for (const [c, re] of CAT_WORDS) if (catText && re.test(catText)) return c;
+  for (const [c, re] of CAT_WORDS) if (re.test(other)) return c;
+  return null;
+}
+function guessWhere(w, hasLink, hasCity) {
+  w = norm(w || '');
+  if (/both|online.*store|store.*online|omni/.test(w)) return 'both';
+  if (/store|offline|shop|branch|in store/.test(w)) return 'store';
+  if (/online|web|app|e ?commerce/.test(w)) return 'online';
+  if (isAdmin && $('defWhere').value) return hasCity && !hasLink ? 'store' : $('defWhere').value;
+  return hasLink ? 'online' : (hasCity ? 'store' : 'both');
+}
+
+function prepare() {
+  const g = (r, k) => (mapping[k] === undefined ? '' : (r[mapping[k]] ?? '')).trim();
+  const now = Date.now(), cap = now + MAX_DAYS * DAY;
+  const seen = new Set();
+  prepared = rows.map((r, i) => {
+    const notes = [];
+    const descr = g(r, 'details');
+    let vendor = cut(g(r, 'vendor'), 40);
+    let title = cut(g(r, 'title') || descr, 80);
+    let discount = cut(g(r, 'discount'), 24);
+    if (discount && /^\d+(\.\d+)?$/.test(discount)) discount = discount + '% OFF';
+    if (!discount) { discount = guessDiscount(g(r, 'title'), descr); if (discount) notes.push('discount read from text'); }
+    if (!discount) { discount = 'Special offer'; notes.push('no discount found'); }
+    const code = cut(g(r, 'code'), 30);
+    let link = cut(g(r, 'link'), 190);
+    if (link && !/^https:\/\//i.test(link)) { if (/^http:\/\//i.test(link)) { link = 'https://' + link.slice(7); notes.push('link changed to https'); } else { link = ''; notes.push('link removed (not a web address)'); } }
+    if (link.length < 11) link = link.length ? '' : link;
+    let cat = guessCat(g(r, 'category'), `${vendor} ${title} ${descr}`);
+    if (!cat) { cat = isAdmin ? $('defCat').value : 'Other'; notes.push('category: ' + cat); }
+    let sub = cut(g(r, 'sub'), 40);
+    if (sub && !(SUBS[cat] || []).includes(sub)) sub = (SUBS[cat] || []).find((s) => norm(s) === norm(sub)) || '';
+    if (!sub) for (const [s, re] of Object.entries(SUB_WORDS)) if ((SUBS[cat] || []).includes(s) && re.test(`${title} ${descr}`)) { sub = s; break; }
+    let city = cut(g(r, 'city'), 40) || (isAdmin ? cut($('defCity').value, 40) : '');
+    const where = guessWhere(g(r, 'where'), !!link, !!city);
+    let end = parseDate(g(r, 'expires'));
+    if (!end) { end = new Date(now + MAX_DAYS * DAY); notes.push('no end date → 30 days'); }
+    else if (end.getTime() > cap) { end = new Date(cap); notes.push('end date shortened to 30 days'); }
+    const details = cut(descr && descr !== title ? descr : '', 300);
+    const address = where === 'online' ? '' : cut(g(r, 'address'), 150);
+    let ll = null;
+    if (where !== 'online') {
+      const la = parseFloat(g(r, 'lat')), lo = parseFloat(g(r, 'lng'));
+      ll = (!isNaN(la) && !isNaN(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180) ? [la, lo] : parseLatLng(g(r, 'address'));
+    }
+    let status = notes.length ? 'fix' : 'ok', why = '';
+    if (!vendor) { status = 'skip'; why = 'no brand'; }
+    else if (!title) { status = 'skip'; why = 'no title'; }
+    else if (end.getTime() <= now) { status = 'skip'; why = 'already ended'; }
+    else if (where !== 'online' && !city && !isAdmin) { status = 'skip'; why = 'in-store deal needs a city'; }
+    else if (/\b(nude|nudes|naked|porn|xxx|sex|sexy|escort|onlyfans|nsfw)\b/i.test(`${title} ${descr} ${vendor}`)) { status = 'skip'; why = 'words not allowed'; }
+    const key = `${vendor}|${code}|${title}`.toLowerCase();
+    if (status !== 'skip' && seen.has(key)) { status = 'skip'; why = 'duplicate in file'; }
+    seen.add(key);
+    return { i: i + 2, status, why, notes, key, d: { vendor, title, discount, code, link, category: cat, sub, where, city, details, end, address, ll } };
+  });
+  renderPreview();
+}
+
+function renderPreview() {
+  const ok = prepared.filter((p) => p.status !== 'skip');
+  const fixed = prepared.filter((p) => p.status === 'fix').length;
+  $('summary').innerHTML = `<b>${ok.length}</b> ready to post · <span class="tag fix">${fixed} auto-fixed</span> · <span class="tag skip">${prepared.length - ok.length} skipped</span>`;
+  $('prev').innerHTML = '<tr><th>Row</th><th>Status</th><th>Brand</th><th>Discount</th><th>Title</th><th>Code</th><th>Category</th><th>Where</th><th>Ends</th><th>Link</th></tr>'
+    + prepared.slice(0, 500).map((p) => `<tr><td>${p.i}</td><td><span class="tag ${p.status}">${p.status === 'skip' ? 'skip: ' + esc(p.why) : p.status === 'fix' ? 'fixed' : 'ok'}</span>${p.notes.length ? `<div class="muted">${esc(p.notes.join('; '))}</div>` : ''}</td>
+      <td>${esc(p.d.vendor)}</td><td>${esc(p.d.discount)}</td><td class="wrap">${esc(p.d.title)}</td><td>${esc(p.d.code)}</td><td>${esc(p.d.category)}${p.d.sub ? ' › ' + esc(p.d.sub) : ''}</td>
+      <td>${esc(p.d.where)}${p.d.city ? ' · ' + esc(p.d.city) : ''}${p.d.ll ? ' 📍' : ''}${p.d.address ? `<div class="muted">${esc(p.d.address)}</div>` : ''}</td><td>${p.d.end.toLocaleDateString()}</td><td>${p.d.link ? '✓' : ''}</td></tr>`).join('');
+  $('prevCard').classList.remove('hide');
+  $('post').disabled = ok.length === 0;
+  $('postMsg').textContent = prepared.length > 500 ? 'Preview shows the first 500 rows; all rows will be posted.' : '';
+}
+
+// ---------------- posting ----------------
+function dealDoc(d, source, affiliate) {
+  return {
+    owner: me.uid,
+    ownerName: cut(isAdmin ? ($('asName').value || '5 Sec Deals') : (profileName || d.vendor), 40),
+    vendor: d.vendor, title: d.title, discount: d.discount, code: d.code, link: d.link,
+    category: d.category, details: d.details, sub: d.sub, where: d.where, city: d.city,
+    affiliate: !!affiliate, source,
+    ...(d.address ? { address: d.address } : {}),
+    ...(d.ll ? { lat: d.ll[0], lng: d.ll[1] } : {}),
+    createdAt: serverTimestamp(), confirmedAt: serverTimestamp(), expiresAt: Timestamp.fromDate(d.end),
+  };
+}
+async function myActive() {
+  const s = await getDocs(query(collection(db, 'deals'), where('owner', '==', me.uid)));
+  const now = Date.now();
+  return s.docs.filter((x) => (x.data().expiresAt?.toMillis?.() || 0) > now);
+}
+async function log(kind, ref, info) {
+  try {
+    await addDoc(collection(db, 'logs'), { uid: me.uid, email: me.email, kind, ref: ref || '', info: cut(info, 120),
+      at: serverTimestamp(), expireAt: Timestamp.fromDate(new Date(Date.now() + 365 * DAY)) });
+  } catch (_) {}
+}
+
+$('post').onclick = async () => {
+  let todo = prepared.filter((p) => p.status !== 'skip');
+  if (!confirm(`Post ${todo.length} deals now?\n\nYou confirm every offer is genuine and lawful.`)) return;
+  $('post').disabled = true; $('postMsg').textContent = 'Checking for duplicates…';
+  try {
+    const active = await myActive();
+    const existing = new Set(active.map((x) => { const v = x.data(); return `${v.vendor}|${v.code}|${v.title}`.toLowerCase(); }));
+    const before = todo.length;
+    todo = todo.filter((p) => !existing.has(p.key));
+    const dup = before - todo.length;
+    if (!isAdmin) {
+      const room = Math.max(0, MAX_VENDOR - active.length);
+      if (todo.length > room) { alert(`Vendors can have up to ${MAX_VENDOR} active deals. You have ${active.length}, so only the first ${room} will be posted.`); todo = todo.slice(0, room); }
+    }
+    if (!todo.length) { $('postMsg').textContent = dup ? `Nothing new — ${dup} deals are already live.` : 'Nothing to post.'; $('post').disabled = false; return; }
+    const source = isAdmin ? 'admin' : 'vendor-web', aff = $('aff').checked;
+    $('prog').classList.remove('hide'); $('prog').max = todo.length; $('prog').value = 0;
+    let done = 0, failed = 0;
+    for (let i = 0; i < todo.length; i += 200) {
+      const chunk = todo.slice(i, i + 200);
+      const b = writeBatch(db);
+      chunk.forEach((p) => b.set(doc(collection(db, 'deals')), dealDoc(p.d, source, aff)));
+      try { await b.commit(); done += chunk.length; } catch (e) {
+        // fall back to one-by-one so one bad row doesn't block the rest
+        for (const p of chunk) { try { await addDoc(collection(db, 'deals'), dealDoc(p.d, source, aff)); done++; } catch (_) { failed++; } }
+      }
+      $('prog').value = done + failed;
+      $('postMsg').textContent = `Posted ${done} of ${todo.length}…`;
+    }
+    await log(isAdmin ? 'staff_bulk_deals' : 'deals_bulk_posted', '', `${done} deals${aff ? ' (affiliate)' : ''} · confirmed genuine & lawful`);
+    $('postMsg').innerHTML = `<b>Done: ${done} deals are live.</b>${dup ? ` ${dup} already-live duplicates skipped.` : ''}${failed ? ` <span style="color:var(--red)">${failed} failed (check length/format).</span>` : ''}`;
+    loadMine(); if (isAdmin) loadStats();
+  } catch (e) {
+    $('postMsg').textContent = 'Could not post: ' + (e.code || e.message);
+  }
+  $('post').disabled = false;
+};
+
+// single deal
+$('sPost').onclick = async () => {
+  const v = (id) => $(id).value.trim();
+  const end = parseDate(v('sEnd'));
+  const city = v('sCity'), whereV = $('sWhere').value;
+  let link = v('sLink');
+  const err = !v('sVendor') ? 'Enter the brand / shop name.' : !v('sDiscount') ? 'Enter the discount.' : !v('sTitle') ? 'Enter a title.'
+    : (link && !/^https:\/\/.{3,190}$/.test(link)) ? 'The link must start with https://' : !end || end.getTime() <= Date.now() ? 'Pick an end date in the future.'
+    : end.getTime() > Date.now() + (MAX_DAYS + 1) * DAY ? 'Deals can run for up to 30 days.' : (whereV !== 'online' && !city) ? 'In-store deals need a city.'
+    : !$('sConfirm').checked ? 'Tick the box to confirm the offer is genuine and lawful.' : '';
+  if (err) { $('sMsg').textContent = err; return; }
+  try {
+    if (!isAdmin && (await myActive()).length >= MAX_VENDOR) { $('sMsg').textContent = `You can have up to ${MAX_VENDOR} active deals. End one first.`; return; }
+    const d = { vendor: cut(v('sVendor'), 40), title: cut(v('sTitle'), 80), discount: cut(v('sDiscount'), 24), code: cut(v('sCode'), 30), link,
+      category: $('sCat').value, sub: $('sSub').value, where: whereV, city: cut(city, 40), details: cut(v('sDetails'), 300), end,
+      address: whereV === 'online' ? '' : cut(v('sAddr'), 150), ll: whereV === 'online' ? null : parseLatLng(v('sPin')) };
+    if (v('sPin') && !d.ll && whereV !== 'online') { $('sMsg').textContent = 'Could not read the map pin. Paste coordinates like 26.4207, 50.0888.'; return; }
+    const ref = await addDoc(collection(db, 'deals'), dealDoc(d, isAdmin ? 'admin' : 'vendor-web', $('aff').checked));
+    await log('deal_posted', ref.id, `${d.vendor} · ${d.discount} · ${d.title} · vendor confirmed genuine & lawful`);
+    $('sMsg').textContent = 'Posted! It is live in the app now.';
+    ['sTitle', 'sCode', 'sLink', 'sDetails', 'sDiscount'].forEach((id) => ($(id).value = ''));
+    $('sConfirm').checked = false;
+  } catch (e) { $('sMsg').textContent = 'Could not post: ' + (e.code || e.message); }
+};
+
+// ---------------- my deals ----------------
+async function loadMine() {
+  if (!me) return;
+  const s = await getDocs(query(collection(db, 'deals'), where('owner', '==', me.uid))).catch(() => null);
+  if (!s) return;
+  const now = Date.now();
+  const list = s.docs.map((x) => ({ id: x.id, ...x.data() })).sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+  const live = list.filter((d) => (d.expiresAt?.toMillis?.() || 0) > now);
+  $('mineCount').innerHTML = `<b>${live.length}</b> live deals${isAdmin ? '' : ` (limit ${MAX_VENDOR})`} · ${list.length - live.length} ended`;
+  $('mineTable').innerHTML = '<tr><th>Brand</th><th>Discount</th><th>Title</th><th>Code</th><th>Ends</th><th>👍 / 👎</th><th>Reports</th><th></th></tr>'
+    + list.slice(0, 1000).map((d) => {
+      const ended = (d.expiresAt?.toMillis?.() || 0) <= now;
+      return `<tr><td>${esc(d.vendor)}${d.affiliate ? ' <span class="tag">affiliate</span>' : ''}</td><td>${esc(d.discount)}</td><td class="wrap">${esc(d.title)}</td><td>${esc(d.code)}</td>
+        <td>${ended ? '<span class="tag skip">ended</span>' : d.expiresAt.toDate().toLocaleDateString()}</td>
+        <td>${(d.up || []).length} / ${(d.down || []).length}</td><td>${(d.flags || []).length}</td>
+        <td><button class="ghost" data-id="${d.id}">${ended ? 'Remove' : 'End'}</button></td></tr>`;
+    }).join('');
+  $('mineTable').querySelectorAll('button[data-id]').forEach((b) => b.onclick = async () => {
+    b.disabled = true;
+    try { await deleteDoc(doc(db, 'deals', b.dataset.id)); await log('deal_ended', b.dataset.id, 'ended from partner portal'); } catch (e) { alert(e.code || e.message); }
+    loadMine();
+  });
+}
+$('mineReload').onclick = loadMine;
+$('mineEndAll').onclick = async () => {
+  const s = await getDocs(query(collection(db, 'deals'), where('owner', '==', me.uid)));
+  if (!s.size || !confirm(`End and remove all ${s.size} of your deals? This cannot be undone.`)) return;
+  for (let i = 0; i < s.docs.length; i += 400) { const b = writeBatch(db); s.docs.slice(i, i + 400).forEach((d) => b.delete(d.ref)); await b.commit(); }
+  await log(isAdmin ? 'staff_deals_cleanup' : 'deal_ended', '', `ended all ${s.size} own deals`);
+  loadMine(); if (isAdmin) loadStats();
+};
+
+// ---------------- admin ----------------
+let allDeals = [];
+async function loadStats() {
+  if (!isAdmin) return;
+  const s = await getDocs(collection(db, 'deals')).catch(() => null); if (!s) return;
+  const now = Date.now();
+  allDeals = s.docs;
+  const live = s.docs.filter((d) => (d.data().expiresAt?.toMillis?.() || 0) > now);
+  $('stLive').textContent = live.length;
+  $('stAdmin').textContent = live.filter((d) => d.data().source === 'admin').length;
+  $('stAff').textContent = live.filter((d) => d.data().affiliate === true).length;
+  $('stExp').textContent = s.size - live.length;
+}
+$('stLoad').onclick = loadStats;
+async function bulkDelete(filter, what, kind) {
+  await loadStats();
+  const list = allDeals.filter(filter);
+  if (!list.length) { $('adMsg').textContent = 'Nothing to delete.'; return; }
+  if (!confirm(`Permanently delete ${list.length} ${what}? This cannot be undone.`)) return;
+  for (let i = 0; i < list.length; i += 400) { const b = writeBatch(db); list.slice(i, i + 400).forEach((d) => b.delete(d.ref)); await b.commit(); }
+  await log(kind, '', `deleted ${list.length} ${what}`);
+  $('adMsg').textContent = `Deleted ${list.length} ${what}.`;
+  loadStats();
+}
+$('cleanExp').onclick = () => bulkDelete((d) => (d.data().expiresAt?.toMillis?.() || 0) <= Date.now(), 'expired deals', 'staff_deals_cleanup');
+$('cleanBad').onclick = () => bulkDelete((d) => (d.data().flags || []).length >= 3, 'reported deals', 'staff_takedown');
+</script>
+</body>
+</html>
